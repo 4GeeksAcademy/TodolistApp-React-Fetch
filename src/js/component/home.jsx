@@ -78,33 +78,38 @@ const Home = () => {
 
 	const [username, setUsername] = useState('');
 	const [list, setList] = useState([]);
+	const [input, setInput] = useState('');
 
-	const handlerCreateList = async () => {
+	const handlerCreateUsername = async () => {
 		try {
 			let response = await fetch(`https://playground.4geeks.com/apis/fake/todos/user/${username}`, {
 				method: "POST",
 				body: JSON.stringify([]),
 				headers: {
-					"content-type": "aplication/json"
+					"Content-Type": "aplication/json"
 				}
 			})
 			//validación 
 			if (!response.ok) {
 				throw new Error('Network error');
 			}
-
-			if (username.trim() !== '') { // Verifica que el valor no esté vacío
-				const newItem = { id: + 1, text: username }; // da a cada elemento un id unico
-				setList([...list, newItem]); // Agregar el nuevo elemento a la lista existente
-				setUsername(''); // Limpiar el username
-			};
-
-			let data = await response.jason()
-			console.log(data);
+// .then()? 
+			let data = await response.json();
+		
+				// if (username.trim() !== '') { // Verifica que el valor no esté vacío
+				// 	setUsername(''); // Limpiar el username
+					
+				// }; 
+				setUsername(username)
+			console.log(data) 
 
 		} catch (e) {
 			console.error("el error es: ", e)
 		};
+	}
+	const valueUsername =(e)=>{
+		setUsername(e.target.value)
+		console.log(username)
 	}
 	const handlerShowList = async (e)=> {
 		try {
@@ -120,11 +125,47 @@ const Home = () => {
 			console.error("the new error is: ", e);
 		}
 	}
+	const valueInput=(e)=>{
+		setInput(e.target.value)
+
+	}
+	const handlerList=async()=>{
+		let newItem = {
+			label: input, done: false
+		}
+		try {
+			let response = await fetch(`https://playground.4geeks.com/apis/fake/todos/user/${username}`, {
+				method: "PUT",
+				body: JSON.stringify([]),
+				headers: {
+					"Content-Type": "aplication/json"
+				}
+			})
+			//validación 
+			if (!response.ok) {
+				throw new Error('Network error');
+			}
+// actualización de la lista en si
+			let data = await response.jason().then(()=>{
+				if (username.trim() !== '') { // Verifica que el valor no esté vacío
+					setList([...list, newItem]); // Agregar el nuevo elemento a la lista existente
+					setList(''); // Limpiar la lista
+				}; 
+			})
+			console.log(data) 
+
+		} catch (e) {
+			console.error("el error es: ", e)
+		};
+
+	};
 
 	return (
 		<div>
-			<input type="text" onChange={handlerShowList} />
-			<button onClick={handlerCreateList}>Crear Lista</button>
+			<input type="text" value={username} onChange={valueUsername} />
+			<button onClick={handlerCreateUsername}>Crear usuario</button>
+			<input type="text" value={input} onChange={valueInput}></input>
+			<button onClick={handlerList}></button>
 			<ul>
                 {list.map(item => (
                     <li key={item.id}>{item.text}</li>
